@@ -2,6 +2,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
+import java.nio.file.Paths;
 
 public class Encrypter {
 
@@ -34,6 +35,26 @@ public class Encrypter {
      */
     public void encrypt(String inputFilePath, String encryptedFilePath) throws Exception {
         //TODO: Call the read method, encrypt the file contents, and then write to new file
+        String message = readFile(inputFilePath);
+        char[] array = message.toCharArray();
+        for (int i=0; i < array.length; i++) {
+            int ascii = array[i];
+            if (ascii >= 97 && ascii <= 122) {
+                ascii += shift;
+                if (ascii > 122) {
+                    ascii -= 26;
+                }
+                array[i] = (char)ascii;
+            }
+            else if (ascii >= 65 && ascii <= 90) {
+                ascii += shift;
+                if (ascii > 90) {
+                    ascii -= 26;
+                }
+                array[i] = (char)ascii;
+            }
+        }
+        writeFile(String.valueOf(array), encryptedFilePath);
     }
 
     /**
@@ -45,6 +66,27 @@ public class Encrypter {
      */
     public void decrypt(String messageFilePath, String decryptedFilePath) throws Exception {
         //TODO: Call the read method, decrypt the file contents, and then write to new file
+        String message = readFile(messageFilePath);
+        char[] array = message.toCharArray();
+        int temp = 4;
+        for (int i=0; i < array.length; i++) {
+            int ascii = array[i];
+            if (ascii >= 65 && ascii <= 90) {
+                ascii -= temp;
+                if (ascii < 65) {
+                    ascii += 26;
+                }
+                array[i] = (char)ascii;
+            }
+            else if (ascii >= 97 && ascii <= 122) {
+                ascii -= temp;
+                if (ascii < 97) {
+                    ascii += 26;
+                }
+                array[i] = (char)ascii;
+            }
+        }
+        writeFile(String.valueOf(array), decryptedFilePath);
     }
 
     /**
@@ -57,6 +99,12 @@ public class Encrypter {
     private static String readFile(String filePath) throws Exception {
         String message = "";
         //TODO: Read file from filePath
+        Scanner fileScanner = new Scanner(Paths.get(filePath));
+        while (fileScanner.hasNextLine()) {
+            String line = fileScanner.nextLine();
+            message += line;
+        }
+        fileScanner.close();
         return message;
     }
 
@@ -68,6 +116,13 @@ public class Encrypter {
      */
     private static void writeFile(String data, String filePath) {
         //TODO: Write to filePath
+        try {
+            FileWriter fw = new FileWriter(new File(filePath), false);
+            fw.write(data);
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
